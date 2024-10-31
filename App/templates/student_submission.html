@@ -46,22 +46,26 @@
         
         <!-- Dropdown container for teacher selection -->
         <div class="input-tab">
-            <label for="teacher-select">Select Teacher</label>
+            <label for="teacher">Choose Teacher</label>
+           <div class="input-select">
             <select name="teacher" id="teacher-select" required>
                 <option value="">Choose a Teacher</option>
                 {% for teacher in teachers %}
                     <option value="{{ teacher.id }}">{{ teacher.first_name }} {{ teacher.last_name }}</option>
                 {% endfor %}
             </select>
+           </div>
             <div class="error-tab"></div>
         </div>
         
         <!-- Dropdown container for section selection -->
         <div class="input-tab">
-            <label for="section-select">Select Section</label>
-            <select name="section" id="section-select" required>
-                <option value="">First select a teacher</option>
-            </select>
+            <label for="section">Select your section</label>
+            <div class="input-select">
+                <select name="section" id="section-select" required>
+                    <option value="">First select a teacher</option>
+                </select>
+            </div>
             <div id="section-error" class="error-tab"></div>
         </div>
         

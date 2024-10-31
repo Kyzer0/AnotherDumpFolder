@@ -12,6 +12,7 @@ a {
     text-decoration: none;
 }
 
+
 /* Main container: Centered content with full screen height and a background color */
 .container {
     min-height: 100vh;
@@ -85,11 +86,15 @@ a {
 .container .wrap-up form .input-tab {
     width: 90%;
     height: 55px;
-    margin-top: 25px;
+    margin-top: 45px;
 }
 
-/* Input field design: Styles individual input elements with rounded corners and borders */
-.container .wrap-up form .input-tab input {
+.container .wrap-up form .input-tab .input-select{
+    width: 100% ;
+    height: 100%;
+}
+
+.container .wrap-up form .input-tab  select{
     height: 100%;
     width: 100%;
     outline: none;
@@ -99,6 +104,20 @@ a {
     border: 1px solid #d1d1d1;
 }
 
+
+
+/* Input field design: Styles individual input elements with rounded corners and borders */
+.container .wrap-up form .input-tab input {
+    height: 100%;   
+    width: 100%;
+    outline: none;
+    border: none;
+    border-radius: 8px;
+    padding: 0 15px;
+    border: 1px solid #d1d1d1;
+    margin-top: 10px;
+}
+
 /* Input focus effect: Changes border color when input is focused */
 .container .wrap-up form .input-tab input:focus {
     border-color: #0d6efd;
@@ -106,7 +125,7 @@ a {
 
 /* Submit button container: Sets dimensions and spacing for the submit button area */
 .container .wrap-up form .btn-form {
-    width: 400px;
+    width: 90%;
     height: 55px;
     margin-top: 45px;
     margin-bottom: 5px;
