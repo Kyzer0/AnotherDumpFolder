@@ -184,112 +184,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Initialize teacher profile update functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const updateProfileForm = document.getElementById('update-profile-form');
-        const submitProfileBtn = document.getElementById('submit-profile-btn');
-        const updateTeacherBtn = document.getElementById('update-teacher-btn');
-        const deleteTeacherBtn = document.getElementById('delete-teacher-btn');
+    const updateProfileForm = document.getElementById('update-profile-form');
+    const submitProfileBtn = document.getElementById('submit-profile-btn');
+    const updateTeacherBtn = document.getElementById('update-teacher-btn');
+    const deleteTeacherBtn = document.getElementById('delete-teacher-btn');
     
-        // Handle profile updates and deletion
-        function updateProfile(action) {
-            const formData = new FormData(updateProfileForm);
-            formData.append('action', action);
-            
-            const csrftoken = getCookie('csrftoken');
-        
-            fetch('/api/update_teacher_profile/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': csrftoken
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    if (action === 'delete') {
-                        window.location.href = '/teacher/login/';
-                    } else {
-                        document.getElementById('first-name').value = data.first_name;
-                        document.getElementById('last-name').value = data.last_name;
-                        document.getElementById('display-name').value = data.display_name;
-                    }
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert('An error occurred. Please try again.');
-            });
-        }
-    });
-
-    // Initialize section creation functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const createSectionForm = document.getElementById('create-section-form');
-        const createBtn = document.getElementById('create-btn');
-    
-        if (!createSectionForm || !createBtn) {
-            console.error('Create Section form or button not found');
-            return;
-        }
-    
-        // Handle section creation form submission
-        createSectionForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-    
-            const formData = new FormData(this);
-            console.log('Form data:', Object.fromEntries(formData.entries()));
-    
-            fetch(createSectionForm.action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    window.location.href = '/teacher/dashboard/';
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            });
-        });
-    });
-
-    // Handle profile updates
+    // Handle profile updates and deletion
     function updateProfile(action) {
-        const fullName = document.getElementById('full-name').value;
-        const displayName = document.getElementById('display-name').value;
+        const formData = new FormData(updateProfileForm);
+        formData.append('action', action);
+            
+        const csrftoken = getCookie('csrftoken');
         
-        const data = {
-            action: action,
-            full_name: fullName,
-            display_name: displayName
-        };
-    
         fetch('/api/update_teacher_profile/', {
             method: 'POST',
+            body: formData,
             headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify(data)
+                'X-CSRFToken': csrftoken
+            }
         })
         .then(response => response.json())
         .then(data => {
@@ -298,7 +210,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (action === 'delete') {
                     window.location.href = '/teacher/login/';
                 } else {
-                    document.getElementById('full-name').value = data.full_name;
+                    document.getElementById('first-name').value = data.first_name;
+                    document.getElementById('last-name').value = data.last_name;
                     document.getElementById('display-name').value = data.display_name;
                 }
             } else {
@@ -310,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('An error occurred. Please try again.');
         });
     }
-    
+
     // Add event listeners for profile actions
     document.getElementById('submit-profile-btn').addEventListener('click', () => updateProfile('submit'));
     document.getElementById('update-teacher-btn').addEventListener('click', () => updateProfile('update'));
@@ -671,28 +584,167 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Update timer display with countdown
-function updateTimerDisplay(startTime, duration) {
-    const endTime = new Date(startTime).getTime() + duration * 60000;
-    const timerDisplay = document.getElementById('display');
+//final timer
+// Main script initialization message
+console.log("Teacher dashboard script loaded");
 
-    function update() {
-        const now = new Date().getTime();
-        const distance = endTime - now;
+// Timer variables
+let timerInterval;
+let remainingTime; // in seconds
+let timerState = 'stopped'; // Possible states: 'running', 'stopped'
 
-        if (distance < 0) {
-            clearInterval(interval);
-            timerDisplay.textContent = "00:00:00";
+function startTimer(duration) {
+    if (timerState === 'running') return; // Prevent starting if already running
+
+    remainingTime = duration; // Set remaining time to the provided duration
+    timerState = 'running'; // Update state
+
+    // Set the timer interval and assign it to timerInterval
+    timerInterval = setInterval(() => {
+        if (remainingTime <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById('display').textContent = "00:00:00";
+            document.getElementById('timer-status').textContent = "Timer finished!";
+            timerState = 'stopped'; // Reset state
+            updateTimerStatus(false); // Set is_active to false when finished
             return;
         }
 
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        remainingTime--;
+        updateDisplay();
+    }, 1000);
+    
+}
 
-        timerDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+// Function to stop the timer
+function stopTimer() {
+    if (timerState === 'stopped') {
+        console.warn('Timer is already stopped. No action taken.');
+        return; // Prevent stopping if already stopped
     }
 
-    const interval = setInterval(update, 1000);
-    update();
+    if (timerInterval) {
+        clearInterval(timerInterval); // Clear the interval immediately
+        timerInterval = null; // Reset timerInterval to null to avoid issues
+    }
+
+    timerState = 'stopped'; // Update state
+    console.log('Stopping timer...');
+
+    // Update UI elements
+    document.getElementById('start-timer').style.display = 'inline-block'; // Show start button
+    document.getElementById('stop-timer').style.display = 'none'; // Hide stop button
+    document.getElementById('continue-timer').style.display = 'inline-block'; // Show continue button
+    document.getElementById('timer-status').textContent = "Timer stopped"; // Update status message
+
+    // Update the timer status in the backend
+    updateTimerStatus(false) // Set is_active to false
+        .then(() => {
+            console.log('Timer status updated successfully in the backend.');
+        })
+        .catch(error => {
+            console.error('Failed to update timer status in the backend:', error);
+        });
 }
+
+function startTimer(duration) {
+    if (timerState === 'running') return; // Prevent starting if already running
+
+    remainingTime = duration; // Set remaining time to the provided duration
+    timerState = 'running'; // Update state
+
+    console.log('Starting timer for', duration, 'seconds.');
+
+    // Set the timer interval and assign it to timerInterval
+    timerInterval = setInterval(() => {
+        if (remainingTime <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById('display').textContent = "00:00:00";
+            document.getElementById('timer-status').textContent = "Timer finished!";
+            timerState = 'stopped'; // Reset state
+            updateTimerStatus(false); // Set is_active to false when finished
+            return;
+        }
+
+        remainingTime--;
+        updateDisplay();
+    }, 1000);
+}
+
+// Function to continue the timer
+function continueTimer() {
+    if (timerState === 'running') return; // Prevent continuing if already running
+
+    // Set is_active to true in the backend
+    updateTimerStatus(true); // Set is_active to true
+    startTimer(remainingTime); // Resume the timer
+}
+
+// Function to update the display
+function updateDisplay() {
+    const hours = String(Math.floor(remainingTime / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((remainingTime % 3600) / 60)).padStart(2, '0');
+    const seconds = String(remainingTime % 60).padStart(2, '0');
+    document.getElementById('display').textContent = `${hours}:${minutes}:${seconds}`;
+}
+
+// Function to update the timer status in the backend
+function updateTimerStatus(isActive) {
+    const sectionId = document.getElementById('section').value; // Get the current section ID
+    const teacherId = document.querySelector('input[name="teacher"]').value; // Get the current teacher ID
+
+    fetch(`/update_timer_status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            section_id: sectionId,
+            teacher_id: teacherId,
+            is_active: isActive // Set isActive based on the function call
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Timer status updated successfully:', data);
+        } else {
+            console.error('Error updating timer status:', data.error);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// On page load, check for existing timer state
+document.addEventListener('DOMContentLoaded', function() {
+    const savedState = localStorage.getItem('timerState');
+    if (savedState) {
+        const state = JSON.parse(savedState);
+        remainingTime = state.remainingTime;
+
+        // Ensure remainingTime is a valid number
+        if (typeof remainingTime !== 'number' || remainingTime < 0) {
+            remainingTime = 0; // Reset to 0 if invalid
+        }
+
+        if (state.isActive) {
+            startTimer(remainingTime); // Resume timer if it was active
+        } else {
+            updateDisplay(); // Update display if it was stopped
+        }
+    } else {
+        // Initialize the display to 00:00:00 if no saved state
+        document.getElementById('display').textContent = "00:00:00";
+    }
+});
+
+// Set up event listeners for buttons
+document.getElementById('start-timer').addEventListener('click', () => {
+    const duration = parseInt(document.getElementById('duration').value) * 60; // Convert minutes to seconds
+    startTimer(duration);
+});
+
+document.getElementById('stop-timer').addEventListener('click', stopTimer); // Call stopTimer when the stop button is clicked
+
+document.getElementById('continue-timer').addEventListener('click', continueTimer); // Call continueTimer when the continue button is clicked

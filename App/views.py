@@ -654,6 +654,21 @@ def test_timeline(request):
                 'error': 'No active timeline found'
             })
 
+@csrf_exempt  # Use with caution; consider using CSRF tokens for security
+@require_POST
+def update_timer_status(request):
+    try:
+        data = json.loads(request.body)
+        section_id = data.get('section_id')
+        teacher_id = data.get('teacher_id')
+        is_active = data.get('is_active')
+
+        # Update the active status of the timeline
+        Timeline.objects.filter(section_id=section_id, teacher_id=teacher_id, is_active=True).update(is_active=is_active)
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
 # Purpose: Function that provides view for manual timeline testing
 @login_required
 def test_timeline_view(request, section_id):
